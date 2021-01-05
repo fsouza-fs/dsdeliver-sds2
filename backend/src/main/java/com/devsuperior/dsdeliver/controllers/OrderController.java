@@ -2,6 +2,7 @@ package com.devsuperior.dsdeliver.controllers;
 
 import com.devsuperior.dsdeliver.dto.OrderDTO;
 import com.devsuperior.dsdeliver.services.OrderService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(value = "/orders")
+@Slf4j
 public class OrderController {
 
     @Autowired
@@ -25,9 +27,14 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderDTO> insert(@RequestBody OrderDTO orderDTO) {
-        orderDTO = orderService.insert(orderDTO);
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
-                .buildAndExpand(orderDTO.getId()).toUri();
+        URI uri = null;
+        try {
+            orderDTO = orderService.insert(orderDTO);
+            uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(orderDTO.getId()).toUri();
+        } catch (Exception e) {
+            log.info(e.getMessage());
+        }
         return ResponseEntity.created(uri).body(orderDTO);
     }
 
